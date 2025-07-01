@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
 	"github.com/mahdi-cpp/PhotoKit/cache"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"github.com/mahdi-cpp/PhotoKit/utils"
 )
 
@@ -13,8 +13,8 @@ type CameraDTO struct {
 }
 
 type Camera struct {
-	Name   string          `json:"name"`
-	Images []model.UIImage `json:"images"`
+	Name   string           `json:"name"`
+	Images []models.UIImage `json:"images"`
 }
 
 func GetCameras(folder string) CameraDTO {
@@ -36,7 +36,7 @@ func GetCameras(folder string) CameraDTO {
 		camera.Name = utils.CameraNames[nameIndex]
 
 		for j := 0; j < 6; j++ {
-			var image model.UIImage
+			var image models.UIImage
 			image = uiImages[index+2+j]
 			camera.Images = append(camera.Images, image)
 		}

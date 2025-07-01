@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
 	"github.com/mahdi-cpp/PhotoKit/cache"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"github.com/mahdi-cpp/PhotoKit/utils"
 )
 
@@ -13,11 +13,9 @@ type PeopleDTO struct {
 }
 
 type PeopleGroup struct {
-	Names  []string      `json:"names"`
-	Photo1 model.UIImage `json:"photo1"`
-	Photo2 model.UIImage `json:"photo2"`
-	Photo3 model.UIImage `json:"photo3"`
-	Photo4 model.UIImage `json:"photo4"`
+	Names  []string       `json:"names"`
+	Photo1 models.UIImage `json:"photo1"`
+	Photo2 models.UIImage `json:"photo2"`
 }
 
 func GetPeoples(folder string) {
@@ -25,7 +23,7 @@ func GetPeoples(folder string) {
 	var file = "data.txt"
 	var uiImages = cache.ReadOfFile(folder, file)
 
-	var count = (len(uiImages) / 4) - 4
+	var count = (len(uiImages) / 2)
 
 	if count > 15 {
 		count = 15
@@ -37,24 +35,20 @@ func GetPeoples(folder string) {
 	for i := 0; i < count; i++ {
 		var personGroup = PeopleGroup{}
 
-		if nameIndex+4 >= len(utils.FackNames) {
+		if nameIndex+2 >= len(utils.FackNames) {
 			nameIndex = 0
 		}
 
 		personGroup.Names = append(personGroup.Names, utils.FackNames[nameIndex])
 		personGroup.Names = append(personGroup.Names, utils.FackNames[nameIndex+1])
-		personGroup.Names = append(personGroup.Names, utils.FackNames[nameIndex+2])
-		personGroup.Names = append(personGroup.Names, utils.FackNames[nameIndex+3])
 
 		personGroup.Photo1 = uiImages[index+1]
 		personGroup.Photo2 = uiImages[index+2]
-		personGroup.Photo3 = uiImages[index+3]
-		personGroup.Photo4 = uiImages[index+4]
 
 		peopleDTO.PeopleGroup = append(peopleDTO.PeopleGroup, personGroup)
 
 		nameIndex++
-		index += 4
+		index += 2
 	}
 
 	index = 0

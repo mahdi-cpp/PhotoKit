@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
 	"github.com/mahdi-cpp/PhotoKit/cache"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"github.com/mahdi-cpp/PhotoKit/utils"
 )
 
@@ -13,8 +13,8 @@ type AlbumDTO struct {
 }
 
 type Album struct {
-	Name   string          `json:"name"`
-	Images []model.UIImage `json:"images"`
+	Name   string           `json:"name"`
+	Images []models.UIImage `json:"images"`
 }
 
 func GetAlbums(folder string) AlbumDTO {
@@ -39,7 +39,7 @@ func GetAlbums(folder string) AlbumDTO {
 		album.Name = utils.FackTrips[nameIndex]
 
 		for j := 0; j < 5; j++ {
-			var image model.UIImage
+			var image models.UIImage
 			image = uiImages[index+1+j]
 			album.Images = append(album.Images, image)
 		}

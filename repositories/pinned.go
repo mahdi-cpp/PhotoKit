@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
 	"github.com/mahdi-cpp/PhotoKit/cache"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"github.com/mahdi-cpp/PhotoKit/utils"
 )
 
@@ -14,10 +14,10 @@ type PinnedCollectionDTO struct {
 }
 
 type PinnedCollection struct {
-	Name  string        `json:"name"`
-	Type  string        `json:"type"`
-	Icon  string        `json:"icon"`
-	Image model.UIImage `json:"image"`
+	Name  string         `json:"name"`
+	Type  string         `json:"type"`
+	Icon  string         `json:"icon"`
+	Image models.UIImage `json:"image"`
 }
 
 func GetPinned(folder string) {
@@ -42,32 +42,46 @@ func GetPinned(folder string) {
 		pinned.Name = utils.FackNames[nameIndex]
 		pinned.Image = uiImages[index]
 
-		if index == 0 {
+		if index == 2 {
 			pinned.Name = "Favourite"
 			pinned.Type = "favourite"
-			pinned.Icon = "icons8-favourite-60.png"
-			pinned.Image.Name = "chat_19"
-		} else if index == 1 {
+			pinned.Icon = "icons8-favourite-60"
+			pinned.Image.Named = "chat_19"
+		} else if index == 3 {
 			pinned.Name = "Map"
 			pinned.Type = "map"
-			pinned.Icon = "icons8-albums-50.png"
-			pinned.Image.Name = "Screenshot from 2024-08-08 01-04-57"
-		} else if index == 2 {
-			pinned.Name = "Trips"
+			pinned.Icon = "icons8-albums-50"
+			pinned.Image.Named = "Screenshot from 2024-08-08 01-04-57"
+		} else if index == 0 {
+			pinned.Name = "Camera"
 			pinned.Type = "trips"
-			pinned.Icon = "icons8-trip-50.png"
-		} else if index == 3 {
+			pinned.Icon = "camera_photo_51"
+			pinned.Image.Named = "IMG_20141015_185832"
+		} else if index == 1 {
+			pinned.Name = "Screenshots"
+			pinned.Type = "trips"
+			pinned.Icon = "screenshot_60"
+			pinned.Image.Named = "all_84"
+		} else if index == 4 {
 			pinned.Name = "Videos"
 			pinned.Type = "videos"
-			pinned.Icon = "icons8-video-60.png"
-		} else if index == 4 {
-			pinned.Name = "Album"
-			pinned.Type = "album"
-			pinned.Icon = "icons8-albums-50.png"
+			pinned.Icon = "icons8-video-60"
+			pinned.Image.Named = "IMG_20141015_185832"
 		} else if index == 5 {
-			pinned.Name = "Electronic"
+			pinned.Name = "الکترونیک"
 			pinned.Type = "album"
-			pinned.Icon = "icons8-albums-50.png"
+			pinned.Icon = "all_84"
+			pinned.Image.Named = "b44b4f5b11b6d88022746825379a323f0badc1c2_1697894819 (1)"
+		} else if index == 6 {
+			pinned.Name = "Telegram"
+			pinned.Type = "album"
+			pinned.Icon = ""
+			pinned.Image.Named = "021"
+		} else if index == 7 {
+			pinned.Name = "Trips"
+			pinned.Type = "icons8-trip-50"
+			pinned.Icon = "icons8-albums-50"
+			pinned.Image.Named = "IMG_20141015_185832"
 		}
 
 		pinnedCollectionDTO.PinnedCollections = append(pinnedCollectionDTO.PinnedCollections, pinned)

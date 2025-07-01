@@ -3,7 +3,7 @@ package cache
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"os"
 )
 
@@ -17,7 +17,7 @@ type InputJSON struct {
 	FileType    string `json:"fileType"`
 }
 
-func ReadOfFile(folder string, file string) []model.UIImage {
+func ReadOfFile(folder string, file string) []models.UIImage {
 
 	var inputImages []InputJSON
 
@@ -37,27 +37,26 @@ func ReadOfFile(folder string, file string) []model.UIImage {
 	}
 
 	// Convert to UIImage structs
-	var outputImages []model.UIImage
+	var outputImages []models.UIImage
 
 	for _, img := range inputImages {
 
 		aspectRatio := float32(img.Height) / float32(img.Width)
 
-		output := model.UIImage{
-			Name:        img.Name,
-			FileType:    img.FileType,
+		output := models.UIImage{
+			Named:       img.Name,
+			Format:      img.FileType,
 			Orientation: img.Orientation,
 			AspectRatio: aspectRatio,
-			Size: model.CGSize{
+			Size: models.CGSize{
 				Width:  float32(img.Width),
 				Height: float32(img.Height),
 			},
-			VideoInfo: model.VideoInfo{
-				IsVideo:         false, // Default value
-				VideoDuration:   0,     // Default value
-				HasSubtitle:     false, // Default value
-				VideoFormat:     "",    // Default value
-				HasVideoControl: false, // Default value
+			VideoInfo: models.VideoInfo{
+				IsVideo:       false, // Default value
+				VideoDuration: 0,     // Default value
+				HasSubtitle:   false, // Default value
+				VideoFormat:   "",    // Default value
 			},
 		}
 
@@ -67,9 +66,9 @@ func ReadOfFile(folder string, file string) []model.UIImage {
 	return outputImages
 }
 
-//func ReadOfFile(folder string, file string) []model.UIImage {
+//func ReadOfFile(folder string, file string) []models.UIImage {
 //
-//	var photos []model.UIImage
+//	var photos []models.UIImage
 //
 //	// Open the file for reading
 //	f, err := os.Open(folder + file)

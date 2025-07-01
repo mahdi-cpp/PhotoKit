@@ -1,13 +1,14 @@
-package model
+package models
 
 // UIImage An object that manages image data in your app.
 type UIImage struct {
-	Name        string    `json:"name"`
-	FileType    string    `json:"fileType"`
+	Named       string    `json:"named"`
+	Format      string    `json:"format"`
 	Orientation int       `json:"orientation"`
 	AspectRatio float32   `json:"aspectRatio"`
 	Size        CGSize    `json:"size"`
 	VideoInfo   VideoInfo `json:"videoInfo"`
+	VideoFormat string    `json:"videoFormat"`
 }
 
 type CGSize struct {
@@ -16,9 +17,8 @@ type CGSize struct {
 }
 
 type VideoInfo struct {
-	IsVideo         bool   `json:"isVideo"`
-	VideoDuration   int    `json:"videoDuration"`
-	HasSubtitle     bool   `json:"hasSubtitle"`
-	VideoFormat     string `json:"videoFormat"`
-	HasVideoControl bool   `json:"hasVideoControl"`
+	IsVideo       bool   `json:"isVideo"`
+	VideoDuration int    `json:"videoDuration"`
+	HasSubtitle   bool   `json:"hasSubtitle"`
+	VideoFormat   string `json:"videoFormat"`
 }

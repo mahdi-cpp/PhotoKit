@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
 	"github.com/mahdi-cpp/PhotoKit/cache"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"github.com/mahdi-cpp/PhotoKit/utils"
 )
 
@@ -13,10 +13,10 @@ type ShareAlbumDTO struct {
 }
 
 type ShareAlbum struct {
-	Avatar    model.UIImage   `json:"avatar"`
-	Username  string          `json:"username"`
-	AlbumName string          `json:"albumName"`
-	Images    []model.UIImage `json:"images"`
+	Avatar    models.UIImage   `json:"avatar"`
+	Username  string           `json:"username"`
+	AlbumName string           `json:"albumName"`
+	Images    []models.UIImage `json:"images"`
 }
 
 func GetShareAlbums(folder string) ShareAlbumDTO {
@@ -39,8 +39,27 @@ func GetShareAlbums(folder string) ShareAlbumDTO {
 			nameIndex = 0
 		}
 
-		var avatar = model.UIImage{}
-		avatar.Name = "chat_25"
+		var avatar = models.UIImage{}
+		switch i {
+		case 0:
+			avatar.Named = "chat_78"
+			break
+		case 1:
+			avatar.Named = "chat_8"
+			break
+		case 2:
+			avatar.Named = "chat_23"
+			break
+		case 3:
+			avatar.Named = "chat_16"
+			break
+		case 4:
+			avatar.Named = "chat_47"
+			break
+		default:
+			avatar.Named = "chat_41"
+		}
+
 		avatar.Size.Width = 500
 		avatar.Size.Height = 500
 		shareAlbum.Avatar = avatar
@@ -48,7 +67,7 @@ func GetShareAlbums(folder string) ShareAlbumDTO {
 		shareAlbum.AlbumName = utils.FackTrips[nameIndex]
 
 		for j := 0; j < 5; j++ {
-			var image model.UIImage
+			var image models.UIImage
 			image = uiImages[index+2+j]
 			shareAlbum.Images = append(shareAlbum.Images, image)
 		}

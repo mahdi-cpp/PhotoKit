@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
 	"github.com/mahdi-cpp/PhotoKit/cache"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"github.com/mahdi-cpp/PhotoKit/utils"
 )
 
@@ -14,9 +14,9 @@ type TropeDTO struct {
 }
 
 type Trip struct {
-	Name  string        `json:"name"`
-	Date  string        `json:"date"`
-	Image model.UIImage `json:"image"`
+	Name  string         `json:"name"`
+	Date  string         `json:"date"`
+	Image models.UIImage `json:"image"`
 }
 
 func GetTrips(folder string) {

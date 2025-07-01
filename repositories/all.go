@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"github.com/mahdi-cpp/PhotoKit/utils"
 	"sync"
 )
@@ -11,34 +11,29 @@ var root = "/"
 
 func InitPhotos() {
 
-	//GetGalleries("/var/cloud/9/", false)
-	//GetGalleries("/var/cloud/id/mahan/", false)
-	GetGalleries("/var/cloud/00-all/", false)
+	//FetchLibraries("/var/cloud/4/", false)
+	//FetchLibraries("/var/cloud/00-all/", false)
+	//FetchLibraries("/var/cloud/family/", false)
+	//FetchLibraries("/var/cloud/00-instagram/razzle-photo/", false)
 
-	//GetGalleries("/var/cloud/00-instagram/razzle-photo/", false)
-	//GetGalleries("/var/cloud/00-instagram/razzle/", true)
-	//GetGalleries("/var/cloud/00-instagram/ashtonhall/", true)
-	//GetGalleries("/var/cloud/00-instagram/video/", true)
+	//FetchLibraries("/var/cloud/00-instagram/ashtonhall/", true)
+	//FetchLibraries("/var/cloud/00-instagram/razzle/", true)
+	//FetchLibraries("/var/cloud/00-instagram/video/", true)
 
-	var a = "/var/cloud/00-instagram/razzle-photo/"
-	var m = "/var/cloud/id/mahan/"
+	var a = "/var/cloud/family/"
+	var m = "/var/cloud/family/"
 
-	GetProfile()
-	GetRecently(m)
-	GetPeoples("/var/cloud/00-instagram/ashtonhall/")
+	GetRecently("/var/cloud/00-instagram/ashtonhall/")
+	GetPeoples("/var/cloud/people/")
 	GetTrips(m)
-
-	GetPinned("/var/cloud/id/mahan/")
+	GetPinned("/var/cloud/00-instagram/razzle-photo/")
 	GetPinnedGallery(a)
-
 	GetYears("/var/cloud/00-all/")
 
 	albumDTO = GetAlbums(a)
 
-	//shareAlbumDTO = GetShareAlbums("/var/cloud/id/mahan/")
-	shareAlbumDTO = GetShareAlbums("/var/cloud/id/mahan/")
-
-	cameraDTO = GetCameras(a)
+	shareAlbumDTO = GetShareAlbums("/var/cloud/00-instagram/razzle-photo/")
+	cameraDTO = GetCameras("/var/cloud/00-instagram/video/")
 
 	utils.GetCities()
 	utils.GetNames()
@@ -57,10 +52,8 @@ func ReloadSubtitle() {
 	newSubTitle, _ = GetSubtitle()
 }
 
-func RestFeed() map[string]any {
+func RestCollections() map[string]any {
 	return gin.H{
-		"profileDTO":          profileDTO,
-		"galleryDTO":          galleryDTO,
 		"recentDaysDTO":       recentDaysDTO,
 		"peopleDTO":           peopleDTO,
 		"tripDTO":             tripDTO,
@@ -68,12 +61,6 @@ func RestFeed() map[string]any {
 		"albumDTO":            albumDTO,
 		"shareAlbumDTO":       shareAlbumDTO,
 		"cameraDTO":           cameraDTO,
-	}
-}
-
-func RestGallery() map[string]any {
-	return gin.H{
-		"galleryDTO": galleryDTO,
 	}
 }
 
@@ -106,11 +93,11 @@ func RestPinnedCollections() map[string]any {
 	}
 }
 
-type User struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
+//type User struct {
+//	Id    int    `json:"id"`
+//	Name  string `json:"name"`
+//	Email string `json:"email"`
+//}
 
 func RestUser() map[string]any {
 	return gin.H{
@@ -122,5 +109,5 @@ func RestUser() map[string]any {
 
 type UIImageCache struct {
 	sync.RWMutex
-	Cache map[int]model.UIImage
+	Cache map[int]models.UIImage
 }

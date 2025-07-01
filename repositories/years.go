@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
 	"github.com/mahdi-cpp/PhotoKit/cache"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"strconv"
 )
 
@@ -13,8 +13,8 @@ type YearsDTO struct {
 }
 
 type Year struct {
-	Title string        `json:"title"`
-	Photo model.UIImage `json:"photo"`
+	Title string         `json:"title"`
+	Photo models.UIImage `json:"photo"`
 }
 
 func GetYears(folder string) {

@@ -3,7 +3,7 @@ package cache
 import (
 	"bytes"
 	"fmt"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -16,11 +16,32 @@ import (
 
 var folders = []string{
 
+	"/var/cloud/applications/PhotoKit/Assets/1/",
+	"/var/cloud/applications/PhotoKit/Assets/1/thumbnail",
+
+	"/var/cloud/applications/PhotoKit/Assets/2/",
+	"/var/cloud/applications/PhotoKit/Assets/2/thumbnail",
+
+	"/var/cloud/family/",
+	"/var/cloud/family/thumbnail",
+
+	"/var/cloud/people/",
+	"/var/cloud/people/thumbnail",
+
 	"/var/cloud/00-all/",
 	"/var/cloud/00-all/thumbnail/",
 
+	"/var/cloud/1/",
+	"/var/cloud/1/thumbnail/",
+
 	"/var/cloud/4/",
 	"/var/cloud/4/thumbnail/",
+
+	"/var/cloud/6/",
+	"/var/cloud/6/thumbnail/",
+
+	"/var/cloud/12/",
+	"/var/cloud/12/thumbnail/",
 
 	"/var/cloud/all/",
 	"/var/cloud/all/thumbnail/",
@@ -41,8 +62,6 @@ var folders = []string{
 
 	"/var/cloud/id/me/",
 	"/var/cloud/id/me/thumbnail",
-	"/var/cloud/id/mahan/",
-	"/var/cloud/id/mahan/thumbnail",
 
 	"/var/cloud/ik/",
 	"/var/cloud/ik/thumbnail",
@@ -113,13 +132,16 @@ var folders = []string{
 
 	"/var/cloud/00-instagram/video/",
 	"/var/cloud/00-instagram/video/thumbnail/",
+
+	"/var/cloud/00-instagram/mysaaat/",
+	"/var/cloud/00-instagram/mysaaat/thumbnail/",
 }
 
 var iconFolder = "/var/cloud/icons/"
 
-//func ReadOfFile(folder string, file string) []model.UIImage {
+//func ReadOfFile(folder string, file string) []models.UIImage {
 //
-//	var photos []model.UIImage
+//	var photos []models.UIImage
 //
 //	// Open the file for reading
 //	f, err := os.Open(folder + file)
@@ -155,7 +177,7 @@ func ReadIcons() {
 
 			if strings.Contains(entry.Name(), ".png") {
 				addIconCash(entry.Name())
-				//fmt.Printf("Reading file: %s\n", entry.Name())
+				//fmt.Printf("Reading file: %s\n", entry.Named())
 			}
 		}
 	}
@@ -311,7 +333,7 @@ var IdGen = NewIDGenerator()
 
 type UIImageCache struct {
 	sync.RWMutex
-	Cache map[int]model.UIImage
+	Cache map[int]models.UIImage
 }
 
-var UIImageMemory = UIImageCache{Cache: make(map[int]model.UIImage)}
+var UIImageMemory = UIImageCache{Cache: make(map[int]models.UIImage)}

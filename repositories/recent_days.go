@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
 	"github.com/mahdi-cpp/PhotoKit/cache"
-	"github.com/mahdi-cpp/PhotoKit/model"
+	"github.com/mahdi-cpp/PhotoKit/models"
 )
 
 var recentDaysDTO RecentDaysDTO
@@ -12,8 +12,8 @@ type RecentDaysDTO struct {
 }
 
 type RecentDays struct {
-	Name   string          `json:"name"`
-	Images []model.UIImage `json:"images"`
+	Name   string           `json:"name"`
+	Images []models.UIImage `json:"images"`
 }
 
 func GetRecently(folder string) {
@@ -33,7 +33,7 @@ func GetRecently(folder string) {
 		var album = RecentDays{}
 
 		for j := 0; j < 4; j++ {
-			var image model.UIImage
+			var image models.UIImage
 			image = uiImages[index+j]
 			album.Images = append(album.Images, image)
 		}
