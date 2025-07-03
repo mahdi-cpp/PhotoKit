@@ -28,7 +28,6 @@ func InitPhotos() {
 	GetTrips(m)
 	GetPinned("/var/cloud/00-instagram/razzle-photo/")
 	GetPinnedGallery(a)
-	GetYears("/var/cloud/00-all/")
 
 	albumDTO = GetAlbums(a)
 

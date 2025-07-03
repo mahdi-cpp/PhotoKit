@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"github.com/disintegration/imaging"
 	"github.com/google/uuid"
+	"github.com/mahdi-cpp/PhotoKit/models"
+	"github.com/mahdi-cpp/PhotoKit/storage"
 	"github.com/mahdi-cpp/PhotoKit/utils"
+	"gorm.io/gorm"
 	"image"
 	"log"
 	"os"
@@ -16,9 +19,19 @@ import (
 var PHAssetsPath = "/var/cloud/applications/PhotoKit/Assets/"
 var uploadPath = "/var/cloud/applications/PhotoKit/upload/"
 
+func checkUrlExists(named string) (bool, error) {
+	var exists bool
+	err := db.Model(&models.PHAsset{}).
+		Select("count(*) > 0").
+		Where("url = ?", named).
+		Find(&exists).
+		Error
+	return exists, err
+}
+
 func checkAssetExists(named string) (bool, error) {
 	var exists bool
-	err := db.Model(&PHAsset{}).
+	err := db.Model(&models.PHAsset{}).
 		Select("count(*) > 0").
 		Where("named = ?", named).
 		Find(&exists).
@@ -26,7 +39,11 @@ func checkAssetExists(named string) (bool, error) {
 	return exists, err
 }
 
-func CreateAssetOfUploadDirectory(id int) {
+func CreateAssetOfUploadDirectory(db1 *gorm.DB, id int) {
+
+	db = db1
+
+	var userIdPath = strconv.FormatInt(int64(id), 10) + "/"
 
 	files, err := os.ReadDir(uploadPath)
 	if err != nil {
@@ -37,37 +54,47 @@ func CreateAssetOfUploadDirectory(id int) {
 
 		var named = file.Name()
 
-		// Check if asset exists by name
-		exists, err := checkAssetExists(named)
+		found, textFile, line, err := storage.SearchTextInFiles(PHAssetsPath+userIdPath, ".txt", named, true)
 		if err != nil {
-			fmt.Printf("Error checking product: %v\n", err)
+			fmt.Printf("Error: %v\n", err)
+			//continue
+		}
+		if found {
+			fmt.Printf("Found text in %s (line %d)\n", textFile, line)
 			continue
 		}
 
-		if exists {
-			fmt.Printf("Asset '%s' exists\n", named)
-			continue
-		}
-
-		if strings.HasSuffix(file.Name(), ".jpg") ||
-			strings.HasSuffix(file.Name(), ".JPG") ||
-			strings.HasSuffix(file.Name(), ".jpeg") ||
-			strings.HasSuffix(file.Name(), ".JPEG") {
+		if strings.HasSuffix(file.Name(), ".jpg") || strings.HasSuffix(file.Name(), ".JPG") || strings.HasSuffix(file.Name(), ".jpeg") || strings.HasSuffix(file.Name(), ".JPEG") {
 
 			var assetUrl = uuid.New().String()
 			var assetFormat = ".jpg"
 
-			err = utils.CopyFile(uploadPath+file.Name(), PHAssetsPath+assetUrl+assetFormat)
+			err = storage.CopyFile(uploadPath+file.Name(), PHAssetsPath+userIdPath+assetUrl+assetFormat)
 			if err != nil {
 				panic(err)
 			}
 
+			//textFile, err := os.OpenFile(PHAssetsPath+userIdPath+assetUrl+".txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+			//if err != nil {
+			//	panic(err)
+			//}
+			//defer textFile.Close()
+			//
+			//if _, err := textFile.WriteString(file.Name() + "\n"); err != nil {
+			//	panic(err)
+			//}
+
 			var portrait = false
 			var Orientation = 0
 
-			var a = PHAssetsPath + assetUrl + ".jpg"
+			var a = PHAssetsPath + userIdPath + assetUrl + ".jpg"
+
+			var cameraMake = ""
+			var cameraModel = ""
+
 			if utils.PhotoHasExifData(a) {
 				has, orientation := utils.ReadExifData(a)
+
 				if has {
 					fmt.Println("Orientation: ", orientation)
 					if strings.Compare(orientation, "6") == 0 {
@@ -81,11 +108,30 @@ func CreateAssetOfUploadDirectory(id int) {
 						Orientation = i
 					}
 				}
+
+				cMake, cModel, err := utils.GetCameraModel(a)
+				if err != nil {
+					log.Printf("Warning: error getting camera info: %v", err)
+					cameraMake = ""
+					cameraModel = ""
+				} else {
+					cameraMake = cMake
+					cameraModel = cModel
+
+					// Convert to NULL if empty after sanitization
+					if cameraMake == "" {
+						cameraMake = "NULL" // For raw SQL, or use sql.NullString
+					}
+					if cameraModel == "" {
+						cameraModel = "NULL"
+					}
+				}
+
 			} else {
 				fmt.Println("not exif data")
 			}
 
-			w, h := getImageDimension(PHAssetsPath + assetUrl + ".jpg")
+			w, h := getImageDimension(PHAssetsPath + userIdPath + assetUrl + ".jpg")
 			var width = 0
 			var height = 0
 			if Orientation == 6 {
@@ -96,32 +142,153 @@ func CreateAssetOfUploadDirectory(id int) {
 				height = h
 			}
 
-			newPHAsset := PHAsset{
-				Url:          assetUrl,
-				Named:        file.Name(),
-				MediaType:    "image",
-				Format:       "jpg",
-				Orientation:  Orientation,
-				PixelWidth:   width,
-				PixelHeight:  height,
+			asset := models.PHAsset{
+				URL:         assetUrl,
+				Named:       named,
+				MediaType:   "image",
+				Format:      "jpg",
+				Orientation: Orientation,
+
+				CameraMake:  cameraMake,
+				CameraModel: cameraModel,
+
+				PixelWidth:  width,
+				PixelHeight: height,
+
 				CreationDate: time.Now(),
 			}
 
+			// Save the asset
+			err = storage.SaveAsset(&asset, userIdPath)
+			if err != nil {
+				fmt.Println("Error saving asset:", err)
+				return
+			}
+
 			// Save the chat to the database
-			if err := db.Create(&newPHAsset).Error; err != nil {
+			if err := db.Debug().Create(&asset).Error; err != nil {
 				log.Printf("Failed to create PHAsset: %v", err)
 			} else {
-				fmt.Printf("Created PHAsset: %+v\n", newPHAsset)
-				CreateTinyAsset(file.Name(), assetUrl, 540, portrait)
-				CreateTinyAsset(file.Name(), assetUrl, 270, portrait)
-				CreateTinyAsset(file.Name(), assetUrl, 135, portrait)
-				CreateTinyAsset(file.Name(), assetUrl, 70, portrait)
+				fmt.Printf("Created PHAsset: %+v\n", asset)
+				CreateTinyAsset(file.Name(), assetUrl, userIdPath, 540, portrait)
+				CreateTinyAsset(file.Name(), assetUrl, userIdPath, 270, portrait)
+				CreateTinyAsset(file.Name(), assetUrl, userIdPath, 135, portrait)
+				CreateTinyAsset(file.Name(), assetUrl, userIdPath, 70, portrait)
 			}
 		}
 	}
 }
 
-func CreateTinyAsset(sourceName string, assetNewName string, createSize int, portrait bool) {
+func CreateOnlyDatabase(db1 *gorm.DB, userId int) {
+
+	db = db1
+
+	var userIdPath = strconv.FormatInt(int64(userId), 10) + "/"
+
+	files, err := os.ReadDir(PHAssetsPath + userIdPath)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for _, file := range files {
+
+		var named = strings.Replace(file.Name(), ".jpg", "", 1)
+
+		// Check if asset exists by name
+		exists, err := checkUrlExists(named)
+		if err != nil {
+			fmt.Printf("Error checking product: %v\n", err)
+			continue
+		}
+
+		if exists {
+			fmt.Printf("Asset '%s' exists\n", named)
+			continue
+		}
+
+		if strings.HasSuffix(file.Name(), ".jpg") || strings.HasSuffix(file.Name(), ".JPG") || strings.HasSuffix(file.Name(), ".jpeg") || strings.HasSuffix(file.Name(), ".JPEG") {
+
+			var Orientation = 0
+			var a = PHAssetsPath + userIdPath + file.Name()
+
+			var cameraMake = ""
+			var cameraModel = ""
+
+			if utils.PhotoHasExifData(a) {
+				has, orientation := utils.ReadExifData(a)
+
+				if has {
+					fmt.Println("Orientation: ", orientation)
+					if strings.Compare(orientation, "6") == 0 {
+						//portrait = true
+					}
+
+					i, err := strconv.Atoi(orientation)
+					if err != nil {
+						fmt.Println("Orientation: ", err)
+					} else {
+						Orientation = i
+					}
+				}
+
+				cMake, cModel, err := utils.GetCameraModel(a)
+				if err != nil {
+					log.Printf("Warning: error getting camera info: %v", err)
+					cameraMake = ""
+					cameraModel = ""
+				} else {
+					cameraMake = cMake
+					cameraModel = cModel
+
+					// Convert to NULL if empty after sanitization
+					if cameraMake == "" {
+						cameraMake = "NULL" // For raw SQL, or use sql.NullString
+					}
+					if cameraModel == "" {
+						cameraModel = "NULL"
+					}
+				}
+
+			} else {
+				fmt.Println("not exif data")
+			}
+
+			w, h := getImageDimension(PHAssetsPath + userIdPath + file.Name())
+			var width = 0
+			var height = 0
+			if Orientation == 6 {
+				width = h
+				height = w
+			} else {
+				width = w
+				height = h
+			}
+
+			newPHAsset := models.PHAsset{
+				UserId:      userId,
+				URL:         named,
+				MediaType:   "image",
+				Format:      "jpg",
+				Orientation: Orientation,
+
+				CameraMake:  cameraMake,
+				CameraModel: cameraModel,
+
+				PixelWidth:  width,
+				PixelHeight: height,
+
+				CreationDate: time.Now(),
+			}
+
+			// Save the chat to the database
+			if err := db.Debug().Create(&newPHAsset).Error; err != nil {
+				log.Printf("Failed to create PHAsset: %v", err)
+			}
+		}
+	}
+}
+
+func CreateTinyAsset(sourceName string, assetNewName string, userIdPath string, createSize int, portrait bool) {
 
 	file := uploadPath + sourceName
 	fmt.Println("CreateTinyAsset: ", sourceName, createSize)
@@ -143,7 +310,7 @@ func CreateTinyAsset(sourceName string, assetNewName string, createSize int, por
 		dstImage = imaging.Resize(srcImage, createSize, 0, imaging.Lanczos)
 	}
 
-	var name2 = PHAssetsPath + "thumbnail/" + assetNewName + "_" + strconv.Itoa(createSize) + ".jpg"
+	var name2 = PHAssetsPath + userIdPath + "thumbnail/" + assetNewName + "_" + strconv.Itoa(createSize) + ".jpg"
 
 	err = imaging.Save(dstImage, name2)
 	if err != nil {
@@ -164,8 +331,4 @@ func getImageDimension(imagePath string) (int, int) {
 	fmt.Printf("Image width: %d\n", width)
 	fmt.Printf("Image height: %d\n", height)
 	return width, height
-}
-
-func CreateUser() {
-
 }

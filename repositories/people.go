@@ -13,9 +13,8 @@ type PeopleDTO struct {
 }
 
 type PeopleGroup struct {
-	Names  []string       `json:"names"`
-	Photo1 models.UIImage `json:"photo1"`
-	Photo2 models.UIImage `json:"photo2"`
+	Name  string         `json:"name"`
+	Photo models.UIImage `json:"photo"`
 }
 
 func GetPeoples(folder string) {
@@ -23,7 +22,7 @@ func GetPeoples(folder string) {
 	var file = "data.txt"
 	var uiImages = cache.ReadOfFile(folder, file)
 
-	var count = (len(uiImages) / 2)
+	var count = len(uiImages) - 1
 
 	if count > 15 {
 		count = 15
@@ -35,20 +34,16 @@ func GetPeoples(folder string) {
 	for i := 0; i < count; i++ {
 		var personGroup = PeopleGroup{}
 
-		if nameIndex+2 >= len(utils.FackNames) {
+		if nameIndex+1 >= len(utils.FackNames) {
 			nameIndex = 0
 		}
 
-		personGroup.Names = append(personGroup.Names, utils.FackNames[nameIndex])
-		personGroup.Names = append(personGroup.Names, utils.FackNames[nameIndex+1])
-
-		personGroup.Photo1 = uiImages[index+1]
-		personGroup.Photo2 = uiImages[index+2]
-
+		personGroup.Name = utils.FackNames[nameIndex]
+		personGroup.Photo = uiImages[index+1]
 		peopleDTO.PeopleGroup = append(peopleDTO.PeopleGroup, personGroup)
 
 		nameIndex++
-		index += 2
+		index += 1
 	}
 
 	index = 0

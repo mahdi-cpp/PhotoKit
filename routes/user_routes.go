@@ -8,6 +8,7 @@ import (
 )
 
 func SetupUserRoutes(router *gin.Engine, db *gorm.DB) {
+
 	userRepo := repositories.NewUserRepository(db)
 	userController := controllers.NewUserController(userRepo)
 

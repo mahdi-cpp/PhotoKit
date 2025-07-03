@@ -21,7 +21,6 @@ func Run() {
 		fmt.Println("Error] failed to start Gin server due to: ", err.Error())
 		return
 	}
-
 }
 
 func getRoutes() {

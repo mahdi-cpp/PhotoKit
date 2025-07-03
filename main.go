@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/mahdi-cpp/PhotoKit/cache"
 	"github.com/mahdi-cpp/PhotoKit/config"
 	"github.com/mahdi-cpp/PhotoKit/repositories"
-	"github.com/mahdi-cpp/PhotoKit/routes"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -38,14 +36,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Initialize repositories
-	repo := repositories.NewRepository(db)
-
-	// Initialize handler
-	assetHandler := routes.NewAssetHandler(repo)
-
-	// Set up routes
-	router.GET("/v1/assets", assetHandler.GetAllAssets)
+	//// Initialize repositories
+	//repo := repositories.NewRepository(db)
+	//
+	//// Initialize handler
+	//assetHandler := routes.NewAssetHandler(repo)
+	//
+	//// Set up routes
+	//router.GET("/v1/assets", assetHandler.GetAllAssets)
+	//// Setup routes
+	//routes.SetupUserRoutes(router, db)
+	//routes.SetupAssetRoutes(router, db)
 
 	// Create repositories
 	//userRepo := repositories.NewUserRepository(db)
@@ -68,9 +69,10 @@ func main() {
 	//}
 	//fmt.Printf("Created user with ID: %d\n", newUser.ID)
 
-	//repositories.CreateAssetOfUploadDirectory(1)
+	repositories.CreateAssetOfUploadDirectory(db, 1)
+	//repositories.CreateOnlyDatabase(db, 1)
 
-	repositories.InitPhotos()
-	cache.ReadIcons()
-	Run()
+	//repositories.InitPhotos()
+	//cache.ReadIcons()
+	//Run()
 }
